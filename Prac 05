@@ -1,0 +1,49 @@
+def change_case(input_str, style):
+    
+    def to_uppercase(char):
+        if 'a' <= char <= 'z':
+            return chr(ord(char) - ord('a') + ord('A'))
+        return char
+    def to_lowercase(char):
+        if 'A' <= char <= 'Z':
+            return chr(ord(char) - ord('A') + ord('a'))
+        return char
+    def reverse_case(char):
+        if 'a' <= char <= 'z':
+            return to_uppercase(char)
+        elif 'A' <= char <= 'Z':
+            return to_lowercase(char)
+        return char
+
+    def alternate_case(s):
+        result = []
+        first_char_upper = 'A' <= s[0] <= 'Z'
+
+        for i, char in enumerate(s):
+            if i % 2 == 0:
+                if first_char_upper:
+                    result.append(to_uppercase(char))
+                else:
+                    result.append(to_lowercase(char))
+            else:
+                if first_char_upper:
+                    result.append(to_lowercase(char))
+                else:
+                    result.append(to_uppercase(char))
+
+        return ''.join(result)
+
+    
+    style = style.lower()
+
+    if style == 'c':
+        return ''.join(to_uppercase(char) for char in input_str)
+    elif style == 's':
+        return ''.join(to_lowercase(char) for char in input_str)
+    elif style == 'r':
+        return ''.join(reverse_case(char) for char in input_str)
+    elif style == 'u':
+        return alternate_case(input_str)
+    else:
+        raise ValueError("Invalid style argument. Use 'c', 's', 'r', or 'u'.")
+
