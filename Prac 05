@@ -47,3 +47,26 @@ def change_case(input_str, style):
     else:
         raise ValueError("Invalid style argument. Use 'c', 's', 'r', or 'u'.")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
