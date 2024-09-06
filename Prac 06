@@ -1,0 +1,12 @@
+def slice(obj, slicing_parameter):
+    slicing_parameter = slicing_parameter.strip('[]')
+    params = slicing_parameter.split(':')
+    params = [int(x) if x else None for x in params]
+    
+    while len(params) < 3:
+        params.append(None)
+    
+    start, stop, step = params
+    return obj[start:stop:step]
+
+print(slice('string', '[1]'))
