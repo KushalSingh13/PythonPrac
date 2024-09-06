@@ -10,3 +10,22 @@ def slice(obj, slicing_parameter):
     return obj[start:stop:step]
 
 print(slice('string', '[1]'))
+
+
+
+def DFA_ends_with_b(text):
+    state = 'q0'
+    
+    for char in text:
+        if char == 'b':
+            state = 'q1'
+        elif char == 'a':
+            state = 'q0'
+        else:
+            return "Rejected"
+    
+    return "Accepted" if state == 'q1' else "Rejected"
+    
+print(DFA_ends_with_b("bab"))
+print(DFA_ends_with_b("baba"))
+print(DFA_ends_with_b("babacb"))
