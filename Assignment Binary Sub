@@ -1,15 +1,19 @@
 Binary Subtraction
 
-def binary_subtraction(bin1, bin2):
+def binary_subtraction(a, b):
+   
+    result = a - b
+    
+   
+    if result < 0:
+        return "-" + bin(abs(result))[2:]
+    
+   
+    return bin(result)[2:]
 
-int1 = int(bin1, 2)
-int2 = int(bin2, 2)
 
-result_int = int1 - int2
+a = int(input("Enter the 1st Number: "))
+b = int(input("Enter the 2nd Number: "))
 
-if result_int < 0:
- raise ValueError("Subtraction results in a negative number, which cannot be represented in binary")
 
-result_bin = bin(result_int)[2:]
-
-return result_bin
+print("Binary subtraction of the two numbers is:", binary_subtraction(a, b))
