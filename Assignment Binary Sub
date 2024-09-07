@@ -1,0 +1,15 @@
+Binary Subtraction
+
+def binary_subtraction(bin1, bin2):
+
+int1 = int(bin1, 2)
+int2 = int(bin2, 2)
+
+result_int = int1 - int2
+
+if result_int < 0:
+ raise ValueError("Subtraction results in a negative number, which cannot be represented in binary")
+
+result_bin = bin(result_int)[2:]
+
+return result_bin
