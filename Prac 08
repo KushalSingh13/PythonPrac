@@ -1,0 +1,14 @@
+Decimal Subtraction
+
+
+
+def subtract_decimal(a, b):
+    
+    result = float(a) - float(b)
+    
+   
+    if result < 0:
+        print(f"Result: -{abs(result):.2f}")
+    else:
+        print(f"Result: {result:.2f}")
+
