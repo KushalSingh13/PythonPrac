@@ -1,0 +1,63 @@
+1.) Valid parenthesis:-
+
+def check_validity(text: str) -> str:
+   
+    bracket_pairs = {')': '(', ']': '[', '}': '{', '>': '<'}
+    
+    
+    stack = []
+    
+    
+    for index, char in enumerate(text):
+       
+        if char in bracket_pairs.values():
+            stack.append(char)
+      
+        elif char in bracket_pairs:
+           
+            if not stack:
+                return f"Invalid: Unmatched closing bracket '{char}' at index {index}"
+           
+            last_opening = stack.pop()
+            if bracket_pairs[char] != last_opening:
+                return f"Invalid: Mismatched bracket '{char}' at index {index}, expected closing for '{last_opening}'"
+        else:
+           
+            return f"Invalid: Character '{char}' at index {index} is not a valid bracket"
+    
+   
+    if stack:
+        return f"Invalid: Unmatched opening brackets '{''.join(stack)}'"
+    
+   
+    return "Valid"
+
+
+2.) Invalid text
+
+def get_valid_invalid_text_count(texts):
+    def is_valid(text):
+        stack = []
+        bracket_map = {')': '(', '}': '{', ']': '['}
+        
+        for char in text:
+            if char in bracket_map.values():
+                stack.append(char)
+            elif char in bracket_map.keys():
+                if stack == [] or bracket_map[char] != stack.pop():
+                    return False
+        return stack == []
+    
+    valid_count = 0
+    invalid_count = 0
+    
+    for item in texts:
+        if isinstance(item, str):  
+            if is_valid(item):
+                valid_count += 1
+            else:
+                invalid_count += 1
+    
+    return (valid_count, invalid_count)
+
+
