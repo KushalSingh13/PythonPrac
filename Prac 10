@@ -1,0 +1,47 @@
+1.) List of Integers 
+
+def get_even_odd_count(Li):
+
+    even_count = 0
+    odd_count = 0
+
+    for i in Li:
+        if i%2 == 0:
+            even_count += 1
+
+        if i%2 == 1:
+            odd_count += 1
+    return even_count, odd_count
+
+print(get_even_odd_count([9, 2, 8, 7, 20, 23]))
+
+
+
+2.) Get Second Largest and Second Smallest
+
+def def_secondLargest_secondSmallest(my_list):
+    if len(my_list) < 2:
+        return None, None 
+    largest = second_largest = float('-inf')
+    smallest = second_smallest = float('inf')
+
+    for number in my_list:
+      
+        if number > largest:
+            second_largest = largest
+            largest = number
+        elif largest > number > second_largest:
+            second_largest = number
+
+      
+        if number < smallest:
+            second_smallest = smallest
+            smallest = number
+        elif smallest < number < second_smallest:
+            second_smallest = number
+
+    if second_largest == float('-inf') or second_smallest == float('inf'):
+        return None, None  # Not enough unique elements for second largest/smallest
+
+    return second_largest, second_smallest
+
