@@ -1,0 +1,544 @@
+1.) Tic_Tac_Toe.py
+
+import random
+
+def display_grid(game_st):
+    size = len(game_st)
+    print('--' * size * 2)
+    for row in game_st:
+        print('|', ' | '.join(row), '|')
+        print('--' * size * 2)
+
+def generate_game_state(size):
+    return [[' ' for _ in range(size)] for _ in range(size)]
+
+def check_winner(game_st, mapping):
+    size = len(game_st)
+    # Check rows
+    for row in game_st:
+        if len(set(row)) == 1 and row[0] != ' ':
+            return True, row[0]
+    
+    # Check columns
+    for col in range(size):
+        column = [game_st[row][col] for row in range(size)]
+        if len(set(column)) == 1 and column[0] != ' ':
+            return True, column[0]
+
+    # Check main diagonal
+    main_diag = [game_st[i][i] for i in range(size)]
+    if len(set(main_diag)) == 1 and main_diag[0] != ' ':
+        return True, main_diag[0]
+
+    # Check anti-diagonal
+    anti_diag = [game_st[i][size-1-i] for i in range(size)]
+    if len(set(anti_diag)) == 1 and anti_diag[0] != ' ':
+        return True, anti_diag[0]
+
+    return False, None
+
+def xo_game():
+    def initialization():
+        print("This is a 2-player Tic-Tac-Toe game. Each player will take turns. The first player to meet the winning condition will win.")
+        player1 = input("Enter the name of the first player: ")
+        player2 = input("Enter the name of the second player: ")
+
+        mapping = {player1: 'x', player2: 'o'}
+        print(f'{player1}, your sign is: {mapping[player1]}\n{player2}, your sign is: {mapping[player2]}')
+
+        size = int(input("Enter the size of the grid: "))
+        game_st = generate_game_state(size)
+        print("\nLet's start the game!\n")
+        display_grid(game_st)
+        return game_st, mapping, player1, player2
+
+    def start_game(game_st, mapping, player1, player2):
+        curr_player = random.choice([player1, player2])
+        size = len(game_st)
+        total_moves = size ** 2
+        for turn in range(total_moves):
+            print(f"\n{curr_player}'s turn:")
+
+            while True:
+                try:
+                    row = int(input(f"Enter row number (1-{size}): ")) - 1
+                    col = int(input(f"Enter column number (1-{size}): ")) - 1
+
+                    if 0 <= row < size and 0 <= col < size:
+                        if game_st[row][col] == ' ':
+                            game_st[row][col] = mapping[curr_player]
+                            break
+                        else:
+                            print("That location is already occupied, please choose a different spot.")
+                    else:
+                        print(f"Invalid input. Please enter row and column between 1 and {size}.")
+                except ValueError:
+                    print("Invalid input. Please enter numbers only.")
+
+            display_grid(game_st)
+
+            # Check for a winner after every move
+            status, winner = check_winner(game_st, mapping)
+            if status:
+                return winner
+
+            # Switch players
+            curr_player = player2 if curr_player == player1 else player1
+
+        # If no winner, it's a draw
+        return None
+
+    def stop_game(winner):
+        if winner == 'x':
+            print(f"\nCongratulations {player1}! You won the game!")
+        elif winner == 'o':
+            print(f"\nCongratulations {player2}! You won the game!")
+        else:
+            print("\nIt's a draw!")
+
+    # Start the game process
+    game_st, mapping, player1, player2 = initialization()
+    winner = start_game(game_st, mapping, player1, player2)
+    stop_game(winner)
+
+# Run the game
+xo_game()
+
+
+2.) Guess_The_Number.Py
+
+
+
+    import random
+
+# Function to initialize the game settings based on difficulty level
+def get_difficulty_level():
+    while True:
+        try:
+            difficulty = int(input("Enter a difficulty level between 1 to 5: "))
+            if 1 <= difficulty <= 5:
+                return difficulty
+            else:
+                print("Invalid input. Please enter a number between 1 and 5.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
+# Function to generate a random number based on the difficulty level
+def generate_random_number(difficulty):
+    ranges = [(1, 3), (1, 5), (1, 10), (1, 25), (1, 50)]
+    start, end = ranges[difficulty - 1]
+    return random.randint(start, end), start, end
+
+# Function to get the user's guess and validate it
+def get_user_guess(start, end):
+    while True:
+        try:
+            user_guess = int(input(f"Guess a number between {start} and {end}: "))
+            if start <= user_guess <= end:
+                return user_guess
+            else:
+                print(f"Please enter a number between {start} and {end}.")
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+
+# Function to start the game and check if the user guessed correctly
+def play_game():
+    difficulty = get_difficulty_level()
+    computer_generated_number, start, end = generate_random_number(difficulty)
+
+    user_guess = get_user_guess(start, end)
+
+    if user_guess == computer_generated_number:
+        print("Congratulations! You guessed the correct number!")
+    else:
+        print(f"You lose. The correct number was {computer_generated_number}.")
+
+# Run the game
+if __name__ == "__main__":
+    play_game()
+
+
+3.) Sudoko.Py
+
+import random
+
+def display_sudoku(board):
+    size = len(board)
+    print('--' * (size * 2 + 1))
+    for i in range(size):
+        print('|', end='')
+        for j in range(size):
+            print(f' {board[i][j]} ' if board[i][j] != ' ' else '   ', end='|')
+        print('\n' + '--' * (size * 2 + 1))
+
+def create_valid_row(board, size):
+    """Generates a valid row that respects Sudoku constraints."""
+    row = []
+    available_numbers = set(range(1, size + 1))
+    
+    for col in range(size):
+        col_values = {board[r][col] for r in range(len(board)) if board[r][col] != ' '}
+        row_values = set(row)
+        
+        # Determine available numbers that are not yet in the column or row
+        valid_numbers = available_numbers - col_values - row_values
+        if not valid_numbers:
+            return None
+        
+        row.append(random.choice(list(valid_numbers)))
+    return row
+
+def generate_game_state(size, difficulty):
+    """Generates a Sudoku board and its solution."""
+    board = []
+    
+    # Create the board by generating rows
+    for _ in range(size):
+        while True:
+            row = create_valid_row(board, size)
+            if row:
+                board.append(row)
+                break
+    
+    solution = [row[:] for row in board]  # Solution is a copy of the filled board
+    
+    # Difficulty mapping and cell removal
+    loss = max(1, int(size * size * {1: 0.2, 2: 0.35, 3: 0.5}[difficulty]))
+    for _ in range(loss):
+        row, col = random.randint(0, size - 1), random.randint(0, size - 1)
+        board[row][col] = ' '  # Remove the value from this cell
+    
+    return board, solution
+
+def is_valid_board(board):
+    """Checks if the current board is valid (no duplicates in rows or columns)."""
+    size = len(board)
+    for i in range(size):
+        row = [x for x in board[i] if x != ' ']
+        col = [board[j][i] for j in range(size) if board[j][i] != ' ']
+        if len(row) != len(set(row)) or len(col) != len(set(col)):
+            return False
+    return True
+
+def get_user_input(board, row, col, size):
+    """Prompts user for input and ensures it's valid."""
+    while True:
+        try:
+            value = int(input(f"Enter a value for [{row+1}][{col+1}] (1-{size}): "))
+            if 1 <= value <= size:
+                return value
+            print(f"Please enter a number between 1 and {size}.")
+        except ValueError:
+            print("Invalid input. Please enter an integer.")
+
+def start_game(board, size, solution):
+    """Runs the game loop where the user tries to solve the puzzle."""
+    print("Let's start the game!")
+    display_sudoku(board)
+    
+    while any(' ' in row for row in board):
+        for row in range(size):
+            for col in range(size):
+                if board[row][col] == ' ':
+                    value = get_user_input(board, row, col, size)
+                    board[row][col] = value
+                    display_sudoku(board)
+                    if not is_valid_board(board):  # Early exit if board becomes invalid
+                        print("Invalid move detected. Try again.")
+                        board[row][col] = ' '  # Revert the move
+                        display_sudoku(board)
+                        break
+    return board == solution
+
+def stop_game(is_winner, solution):
+    """Displays the end game result."""
+    if is_winner:
+        print("Congratulations, you solved the puzzle!")
+    else:
+        print("Sorry, you lost.")
+        print("Here's the correct solution:")
+        display_sudoku(solution)
+
+def sudoku_game():
+    """Main function to start and run the game."""
+    print("Welcome to Sudoku!")
+    
+    size = int(input("Enter the size of the board (e.g., 9 for standard Sudoku): "))
+    difficulty = int(input("Select difficulty level: 1 (Easy), 2 (Medium), 3 (Hard): "))
+    
+    # Generate the board and its solution
+    board, solution = generate_game_state(size, difficulty)
+    
+    # Start the game
+    is_winner = start_game(board, size, solution)
+    
+    # End the game
+    stop_game(is_winner, solution)
+
+if __name__ == "__main__":
+    sudoku_game()
+
+
+4.) xo_game.py
+
+import random
+
+def display_grid(game_st):
+    size = len(game_st)
+    print('--' * size * 2)
+    for row in game_st:
+        print('|', ' | '.join(row), '|')
+        print('--' * size * 2)
+
+def generate_game_state(size):
+    return [[' ' for _ in range(size)] for _ in range(size)]
+
+def check_winner(game_st):
+    size = len(game_st)
+
+    # Check rows and columns for a winner
+    for i in range(size):
+        if game_st[i][0] == game_st[i][1] == game_st[i][2] != ' ':
+            return True, game_st[i][0]
+        if game_st[0][i] == game_st[1][i] == game_st[2][i] != ' ':
+            return True, game_st[0][i]
+
+    # Check diagonals for a winner
+    if game_st[0][0] == game_st[1][1] == game_st[2][2] != ' ':
+        return True, game_st[0][0]
+    if game_st[0][2] == game_st[1][1] == game_st[2][0] != ' ':
+        return True, game_st[0][2]
+
+    return False, None
+
+def get_empty_positions(game_st):
+    return [(r, c) for r in range(len(game_st)) for c in range(len(game_st)) if game_st[r][c] == ' ']
+
+def xo_game():
+    def initialization():
+        print("Welcome to Tic-Tac-Toe! Let's set up the game.")
+        player1 = input("Enter the name of the first player: ")
+        player2 = input("Enter the name of the second player: ")
+        
+        # Assign X and O to players
+        mapping = {player1: 'X', player2: 'O'}
+        print(f"{player1}, your symbol is 'X'. {player2}, your symbol is 'O'.")
+        
+        size = 3  # Fixed to 3x3 Tic-Tac-Toe for simplicity
+        game_st = generate_game_state(size)
+        
+        print("\nStarting the game...\n")
+        display_grid(game_st)
+        
+        return game_st, mapping, player1, player2
+
+    def start_game(game_st, mapping, player1, player2):
+        current_player = random.choice([player1, player2])
+        
+        for turn in range(9):
+            print(f"\n{current_player}'s turn!")
+            
+            # Get all available positions
+            empty_positions = get_empty_positions(game_st)
+            print(f"Available positions: {empty_positions}")
+            
+            # Get a valid move from the current player
+            row, col = None, None
+            while (row, col) not in empty_positions:
+                try:
+                    row, col = map(int, input(f"Enter row and column for your move (1-{len(game_st)}): ").split())
+                    row -= 1  # Adjusting for 0-index
+                    col -= 1  # Adjusting for 0-index
+                except ValueError:
+                    print("Invalid input! Please enter two numbers separated by a space.")
+            
+            game_st[row][col] = mapping[current_player]
+            display_grid(game_st)
+            
+            # Check if there's a winner after this move
+            won, winner = check_winner(game_st)
+            if won:
+                return winner  # Return winner if found
+            
+            # Switch to the other player
+            current_player = player1 if current_player == player2 else player2
+        
+        return None  # No winner, it's a draw
+
+    def stop_game(winner):
+        if winner:
+            print(f"{winner} wins the game!")
+        else:
+            print("It's a draw!")
+
+    # Start the game flow
+    game_st, mapping, player1, player2 = initialization()
+    winner = start_game(game_st, mapping, player1, player2)
+    stop_game(winner)
+
+xo_game()
+
+5.) guess_the_number_win_prizes.py
+
+import random
+
+def guess_the_number():
+    # Function to display the introduction and rules of the game
+    def show_game_rules():
+        print("\nWelcome to 'Guess the Number and Win Prizes'!")
+        print("\nGame Rules:")
+        print("1. You must place an investment greater than zero.")
+        print("2. You have 5 chances to guess the number between 1 and 10.")
+        print("3. Depending on how many attempts it takes, you will earn a prize:")
+        print("    - 1st attempt: 5x your investment")
+        print("    - 2nd attempt: 3x your investment")
+        print("    - 3rd attempt: 2x your investment")
+        print("    - 4th attempt: 1.5x your investment")
+        print("    - 5th attempt: 1x your investment\n")
+
+    # Function to handle the player's investment and validate it
+    def get_investment():
+        while True:
+            try:
+                investment = int(input("Enter the amount you want to invest: "))
+                if investment > 0:
+                    return investment
+                else:
+                    print("Investment must be greater than zero. Try again.")
+            except ValueError:
+                print("Invalid input. Please enter a valid amount in rupees.")
+
+    # Function to handle the player's guesses and reward calculation
+    def play_game(target_number, investment):
+        rewards = {1: 5, 2: 3, 3: 2, 4: 1.5, 5: 1}
+        for attempt in range(1, 6):
+            try:
+                guess = int(input(f"\nAttempt {attempt}: Guess a number between 1 and 10: "))
+                if guess < 1 or guess > 10:
+                    print("Your guess is out of range! Please enter a number between 1 and 10.")
+                    continue
+            except ValueError:
+                print("Invalid input. Please enter an integer between 1 and 10.")
+                continue
+
+            if guess == target_number:
+                return True, rewards[attempt]  # Correct guess, return multiplier
+            elif guess < target_number:
+                print("Too low! Try a higher number.")
+            else:
+                print("Too high! Try a lower number.")
+        
+        return False, 0  # Player didn't guess correctly in 5 attempts
+
+    # Function to announce the result and the prize
+    def end_game(won, multiplier, investment):
+        if won:
+            print(f"\nCongratulations! You've won {investment * multiplier} rupees!")
+        else:
+            print("\nSorry, you didn't win this time. Better luck next time!")
+
+    # Main game flow
+    show_game_rules()
+    investment = get_investment()
+    target_number = random.randint(1, 10)
+
+    won, multiplier = play_game(target_number, investment)
+    end_game(won, multiplier, investment)
+
+# Start the game
+guess_the_number()
+
+
+6.) sudoko_new.py
+
+import random
+import copy
+import math
+
+# Function to display the Sudoku grid
+def display_sudoku(game_state):
+    size = len(game_state)
+    hr_line = '--' * size * 2
+    print(hr_line)
+    for row in game_state:
+        print('|' + ' {} |' * size .format(*row))
+        print(hr_line)
+
+# Function to generate the Sudoku game state
+def generate_game_state(size):
+    def generate_row(existing_rows):
+        """Generates a valid row based on the existing rows."""
+        row = []
+        for i in range(size):
+            possible_values = list(range(1, size + 1))
+
+            # Exclude numbers already present in the same column
+            for existing_row in existing_rows:
+                if existing_row[i] in possible_values:
+                    possible_values.remove(existing_row[i])
+
+            if not possible_values:
+                return None  # No valid number found, backtrack is required
+            
+            # Choose a random valid number
+            row.append(random.choice(possible_values))
+
+        return row
+
+    game_state = []
+    for _ in range(size):
+        row = None
+        while row is None:
+            row = generate_row(game_state)
+        game_state.append(row)
+
+    solution_state = copy.deepcopy(game_state)  # Save the solved version of the board
+    return solution_state
+
+# Function to create the initial Sudoku grid with a given level of difficulty
+def generate_initial_state(size, difficulty_level):
+    """Generates an initial Sudoku state based on the difficulty level."""
+    solution_state = generate_game_state(size)
+    total_cells = size * size
+    difficulty_mapping = {
+        1: ('Very Easy', 20), 2: ('Easy', 35), 3: ('Medium', 50),
+        4: ('Hard', 60), 5: ('Very Hard', 75)
+    }
+    _, difficulty_percentage = difficulty_mapping[difficulty_level]
+    cells_to_remove = math.ceil(difficulty_percentage * total_cells * 0.01)
+    
+    # Create a list of all positions on the board to potentially remove
+    positions = [(r, c) for r in range(size) for c in range(size)]
+    
+    # Remove cells to make the puzzle
+    for _ in range(cells_to_remove):
+        r, c = random.choice(positions)
+        solution_state[r][c] = 0
+        positions.remove((r, c))  # Prevent re-selecting the same position
+
+    return solution_state
+
+# Main function to handle the Sudoku game flow
+def sudoku_new():
+    size = int(input("Enter size (e.g., 9 for a 9x9 board): "))
+    
+    # Ask for the difficulty level
+    print("Choose a difficulty level:")
+    print("1: Very Easy, 2: Easy, 3: Medium, 4: Hard, 5: Very Hard")
+    difficulty_level = int(input("Enter game level between 1 to 5: "))
+    
+    # Generate the initial game state with the selected difficulty
+    game_state = generate_initial_state(size, difficulty_level)
+    
+    print("\nInitial Sudoku Puzzle:")
+    display_sudoku(game_state)
+
+    # Game loop could be implemented here (input, check answers, etc.)
+    print("\nStart solving the puzzle!")
+
+# Run the Sudoku game
+sudoku_new()
+
+
+
+
